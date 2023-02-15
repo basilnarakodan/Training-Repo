@@ -1,46 +1,81 @@
-package com.auriopro.test;
 
 import java.util.Random;
 import java.util.Scanner;
 
-public class PigGame {
-	public static int turn = 0, total = 0;
-
+public class PigGame2 {
+	public static int turn = 1, totalScore = 0, holdScore = 0, turnScore = 0;
+	static String str;
+	static Scanner sc = new Scanner(System.in);
+	
 	public static void main(String[] args) {
-		int die;
-		Random random = new Random();
-		Scanner sc = new Scanner(System.in);
+		startGame();
+	}
 
-		while (total < 20) {
-			int score = 0;
-			++turn;
-			System.out.println("\nTurn " + turn);
-			System.out.println("-------------------");
-
-			System.out.print("Roll or Hold(r/h): ");
-
-			while (sc.next().equals("r") && total < 20) {
-				die = random.nextInt(6) + 1;
-				score += die;
-				total += die;
-				System.out.println(die);
-				if (die == 1) {
-					score = 0;
-					total = 0;
-					System.out.println("Turn over: No score");
-					break;
+	private static void startGame() {
+		boolean roll;
+		System.out.println("\nTurn " + turn);
+		System.out.println("-----------------");
+		System.out.print("Roll or Hold(r/h): ");
+		str = sc.next();
+	
+		if (str.equals("r")) {
+			roll = roll();
+			while (roll) {
+				if (totalScore >= 20) {
+					System.out.println("***You finished in " + turn + " turns***");
+					printScore();
+					System.exit(0);
+				} 
+				else {
+				System.out.print("Roll or Hold(r/h): ");
+				str = sc.next();
+				roll = roll();
 				}
-				if (total < 20)
-					System.out.print("Roll or Hold(r/h): ");
-				else
-					break;
 			}
-			System.out.println("Turn Score: " + score);
-			if (total >= 20) {
-				System.out.println("\nYou won in " + turn + " turns");
-			}
-			System.out.println("Total Score: " + total);
 		}
+		if (str.equals("h")) {
+			hold();
+			turn++;
+			printScore();
+
+			startGame();
+		}
+		if(!str.equals("r") && !str.equals("h")) {
+			System.out.println("invalid input. enter r/h.");
+			startGame();
+		}
+		turn++;
+		printScore();
+		startGame();
+	}
+
+	private static void printScore() {
+		System.out.println("turn Score: " + turnScore);
+		System.out.println("total score: " + totalScore);
+		System.out.println("hold score: " + holdScore);
+	}
+
+	private static void hold() {
+		holdScore = totalScore;
+		totalScore = holdScore;
+	}
+
+	private static boolean roll() {
+		int die;
+		if (str.equals("r")) {
+			Random random = new Random();
+			die = random.nextInt(6) + 1;
+			System.out.println(die);
+			turnScore += die;
+			totalScore +=die;
+			if (die == 1) {
+				turnScore = 0;
+				totalScore = holdScore;
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }
